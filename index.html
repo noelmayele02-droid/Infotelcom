@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infotelcom - L'Excellence Numérique (V5 - Dingue Dark Mode)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Variables et Couleurs Globales */
+        :root {
+            --bg-dark: #070D18; /* Plus sombre que le #0D172A précédent */
+            --bg-deep-blue: #111A29; /* Base des cartes et sections */
+            --text-light: #E2E8F0;
+            --color-primary: #00A6FF; /* Bleu plus électrique/vif */
+            --color-secondary: #4A5568;
+            --color-glow: rgba(0, 166, 255, 0.6);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            scroll-behavior: smooth;
+        }
+
+        .text-primary { color: var(--color-primary); }
+        .bg-primary { background-color: var(--color-primary); }
+        .bg-deep-blue { background-color: var(--bg-deep-blue); }
+        .hover\:bg-primary-dark:hover { background-color: #0077c2; } /* Darker vibrant blue */
+
+        /* Interactive Card Styling: Premium look with subtle border glow */
+        .interactive-card {
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.3); /* Stronger dark shadow */
+            border: 1px solid rgba(74, 85, 104, 0.2); /* Subtler border */
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            /* Soft neon glow on hover */
+            box-shadow: 0 0 50px var(--color-glow), 0 5px 15px -5px rgba(0, 0, 0, 0.15);
+            border-color: var(--color-primary);
+        }
+
+        /* Hero Section - Optional subtle background pattern/animation could be added here */
+        .hero-section {
+            background-image: linear-gradient(135deg, var(--bg-dark) 0%, #152033 100%);
+            border-bottom: 2px solid var(--color-secondary);
+        }
+
+        /* Testimonial Luminous Border Effect (More dramatic look) */
+        .luminous-testimonial {
+            position: relative;
+            background-color: var(--bg-deep-blue);
+            padding: 2rem;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        .luminous-testimonial::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 1rem;
+            padding: 2px; /* Epaisseur du contour */
+            background: linear-gradient(135deg, var(--color-primary) 0%, transparent 50%, var(--color-primary) 100%);
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .luminous-testimonial:hover::before {
+            opacity: 1;
+        }
+
+        /* Tab Styling */
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #9CA3AF;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            color: var(--text-light);
+        }
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background-color: var(--bg-deep-blue);
+        }
+
+        /* Custom level badge colors */
+        .badge-debutant { background-color: #38A169; }
+        .badge-intermediaire { background-color: #ECC94B; }
+        .badge-avance { background-color: #E53E3E; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navbar -->
+    <header class="bg-deep-blue shadow-2xl sticky top-0 z-50 border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-5">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-3xl sm:text-4xl font-extrabold text-primary tracking-tighter hover:text-white transition duration-300">Infotelcom</a>
+                </div>
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="#accueil" class="text-gray-300 hover:text-primary transition duration-150 ease-in-out font-medium">Accueil</a>
+                    <a href="#avantages" class="text-gray-300 hover:text-primary transition duration-150 ease-in-out font-medium">Avantages</a>
+                    <a href="#dashboard" class="text-gray-300 hover:text-primary transition duration-150 ease-in-out font-medium">Formations</a>
+                    <a href="#temoignages" class="text-gray-300 hover:text-primary transition duration-150 ease-in-out font-medium">Témoignages</a>
+                    <a href="#contact" class="px-6 py-2 rounded-full bg-primary text-white hover:bg-primary-dark transition duration-300 font-bold shadow-xl shadow-primary/40 transform hover:scale-105 tracking-wide">
+                        S'inscrire Maintenant
+                    </a>
+                </nav>
+                <!-- Mobile Menu Button (Placeholder) -->
+                <button class="md:hidden text-gray-300 hover:text-primary">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="accueil">
+        <!-- Section Hero (Accueil Immersif, Dark Theme) -->
+        <section class="hero-section pt-32 pb-40 sm:pt-40 sm:pb-52 text-white relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    <!-- Contenu textuel -->
+                    <div class="lg:col-span-7">
+                        <span class="text-md font-semibold mb-4 inline-block px-4 py-1 rounded-full text-primary bg-primary/10 backdrop-blur-sm shadow-lg border border-primary/50 animate-pulse-slow">
+                            L'Élite du Numérique
+                        </span>
+                        <h1 class="text-5xl sm:text-7xl lg:text-[5.5rem] font-extrabold leading-tight mb-6 drop-shadow-2xl">
+                            Accélérez Votre <span class="text-primary tracking-wide">Potentiel IT</span>.
+                        </h1>
+                        <p class="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl">
+                            Des cursus intensifs et des experts du secteur pour faire de vous l'architecte technologique recherché par les plus grandes entreprises.
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
+                            <a href="#dashboard" class="inline-flex justify-center items-center px-10 py-4 border border-transparent text-lg font-bold rounded-full shadow-2xl text-white bg-primary hover:bg-primary-dark transition duration-300 transform hover:scale-[1.05] shadow-primary/50">
+                                Démarrer l'Exploration
+                            </a>
+                            <a href="#contact" class="inline-flex justify-center items-center px-10 py-4 border-2 border-gray-600 text-lg font-bold rounded-full text-gray-300 hover:border-white hover:text-white transition duration-300 transform hover:scale-[1.05]">
+                                Voir les Projets
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Illustration -->
+                    <div class="lg:col-span-5 hidden lg:flex justify-center relative">
+                        <div class="w-full max-w-sm h-96 bg-gray-900/40 rounded-3xl shadow-3xl overflow-hidden flex items-center justify-center border-4 border-gray-700/50 backdrop-blur-md relative">
+                            <svg class="w-2/3 h-2/3 text-primary/70 animate-ping-slow absolute opacity-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4-9h-3V8h-2v3H8v2h3v3h2v-3h3v-2z" fill="currentColor"/></svg>
+                                <span class="text-xl font-mono text-gray-400 z-10"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Indicateurs Clés -->
+        <section class="bg-deep-blue py-16 -mt-20 z-20 relative rounded-t-3xl shadow-inner shadow-black/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center text-white">
+                    <div class="bg-gray-800/50 p-6 rounded-2xl interactive-card border-t-4 border-primary/70">
+                        <p class="text-5xl sm:text-6xl font-extrabold mb-1 text-primary drop-shadow-lg glow-text">+500</p>
+                        <p class="text-gray-300 text-lg font-medium">Professionnels Formés</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-6 rounded-2xl interactive-card border-t-4 border-primary/70">
+                        <p class="text-5xl sm:text-6xl font-extrabold mb-1 text-primary drop-shadow-lg glow-text">95%</p>
+                        <p class="text-gray-300 text-lg font-medium">Employabilité Garantie</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-6 rounded-2xl interactive-card border-t-4 border-primary/70">
+                        <p class="text-5xl sm:text-6xl font-extrabold mb-1 text-primary drop-shadow-lg glow-text">15+</p>
+                        <p class="text-gray-300 text-lg font-medium">Années d'Excellence IT</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Pourquoi nous choisir (Reworked for maximum impact) -->
+        <section id="avantages" class="py-24 lg:py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-lg font-semibold text-primary mb-2 block">L'Écosystème de Réussite</span>
+                    <h2 class="text-4xl sm:text-5xl font-extrabold text-white mt-2 mb-4">La Différence Infotelcom</h2>
+                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                        Une pédagogie unique, des outils de pointe et un réseau d'anciens pour un impact immédiat sur votre carrière.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <!-- Avantage 1: Coaching Carrière -->
+                    <div class="bg-deep-blue interactive-card p-8 rounded-2xl shadow-xl border-l-4 border-primary/80 transform hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/30">
+                        <div class="w-12 h-12 text-primary mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a4.5 4.5 0 002.343-5.875A3.753 3.753 0 0018 9.75a3.75 3.75 0 00-3.567 2.378L9.83 14.733c-.495.27-.923.483-1.391.483s-.896-.213-1.39-.483L3.567 12.153A3.75 3.75 0 002.25 15.75v1.875C2.25 18.665 3.125 19.5 4.28 19.5h15.44a4.5 4.5 0 00-2.343-5.875M16.5 6a3 3 0 100 6 3 3 0 000-6zM7.5 6a3 3 0 100 6 3 3 0 000-6z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Coaching Personnalisé</h3>
+                        <p class="text-gray-400">Accès direct aux entreprises partenaires et ateliers de préparation aux entretiens d'embauche spécifiques à l'IT.</p>
+                    </div>
+                    <!-- Avantage 2: Laboratoires Virtuels -->
+                    <div class="bg-deep-blue interactive-card p-8 rounded-2xl shadow-xl border-l-4 border-primary/80 transform hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/30">
+                        <div class="w-12 h-12 text-primary mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.526 3.012 5.526-3.012m-11.052 0v8.711m11.052-8.711v8.711m-11.052 0l-4.179-2.25m4.179 2.25l5.526-3.012m5.526 3.012l4.179 2.25m-4.179-2.25V9.75M12 21.75V12M4.5 12h15" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Plateforme de Labs</h3>
+                        <p class="text-gray-400">Pratiquez sur des environnements cloud réels et des laboratoires de cybersécurité virtualisés 24/7. (Hands-on first).</p>
+                    </div>
+                    <!-- Avantage 3: Certification & Réseau -->
+                    <div class="bg-deep-blue interactive-card p-8 rounded-2xl shadow-xl border-l-4 border-primary/80 transform hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/30">
+                        <div class="w-12 h-12 text-primary mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25V6m1.5 0H21m-14.25 0h-3V5.25A2.25 2.25 0 015.25 3h3A2.25 2.25 0 0110.5 5.25V6m-1.5 0h1.5m3 0h1.5M12 9.75v6" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.5H21M3 16.5h7.5" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Titre Certifiant Global</h3>
+                        <p class="text-gray-400">Des titres reconnus mondialement, validant votre expertise technique et ouvrant les portes du marché international.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Dashboard des Formations -->
+        <section id="dashboard" class="py-24 lg:py-32 bg-deep-blue/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl sm:text-5xl font-extrabold text-white mt-2 mb-4">Notre Pôle d'Expertise Numérique</h2>
+                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                        Sélectionnez un domaine pour visualiser les cursus et les prérequis de chaque programme.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+                    <!-- Colonne 1: Filtres (Onglets Dynamiques) & Visualisation -->
+                    <aside class="lg:col-span-1 bg-deep-blue p-8 rounded-3xl shadow-2xl h-fit sticky top-24 interactive-card border border-gray-700">
+                        <!-- Onglets de Catégories -->
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-5 border-b border-gray-700 pb-3">Domaines de Spécialisation</h3>
+                            <div id="tab-container" class="flex flex-col space-y-2">
+                                <!-- Les onglets seront générés par JS -->
+                            </div>
+                        </div>
+
+                        <!-- Visualisation Chart.js -->
+                        <div class="mt-10 pt-6 border-t border-gray-700">
+                            <h3 class="text-xl font-bold text-white mb-4 text-center">Durée Moyenne des Cursus</h3>
+                            <p class="text-sm text-gray-500 text-center mb-4">Durée des programmes en mois.</p>
+                            <div class="chart-container h-64">
+                                <canvas id="durationChart"></canvas>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Colonne 2: Liste des Formations filtrées -->
+                    <div class="lg:col-span-2">
+                        <div id="formations-list" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Les cartes de formation seront injectées ici par JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Témoignages (Rétroéclairée et Luminous) -->
+        <section id="temoignages" class="bg-deep-blue py-20 sm:py-28 lg:py-36 relative overflow-hidden border-t border-b border-gray-700/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl sm:text-5xl font-extrabold mb-4 text-primary">Le Verdict de Nos Diplômés</h2>
+                    <p class="text-xl text-gray-300">Des succès concrets qui illustrent la puissance de notre formation.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Témoignage 1 -->
+                    <div class="luminous-testimonial transform hover:scale-[1.02] shadow-2xl shadow-black/60">
+                        <p class="text-5xl text-primary mb-4 font-serif">“</p>
+                        <p class="text-lg italic mb-4 leading-relaxed font-light text-gray-200">"Le programme est d'une intensité rare. En tant qu'ancien chef de projet, j'ai trouvé le saut de carrière vers l'architecture cloud facilité par la qualité des labs."</p>
+                        <p class="font-bold text-lg mt-6 text-white">- Daniel K. (Architecte Cloud)</p>
+                        <p class="text-sm text-gray-500">Promotion Dév. Logiciel</p>
+                    </div>
+                    <!-- Témoignage 2 -->
+                    <div class="luminous-testimonial transform hover:scale-[1.02] shadow-2xl shadow-black/60">
+                        <p class="text-5xl text-primary mb-4 font-serif">“</p>
+                        <p class="text-lg italic mb-4 leading-relaxed font-light text-gray-200">"La formation Cybersécurité m'a transformé en expert du SOC. Les formateurs sont des pointures, ils partagent les techniques d'attaque/défense les plus actuelles."</p>
+                        <p class="font-bold text-lg mt-6 text-white">- Léa V. (Analyste SOC N3)</p>
+                        <p class="text-sm text-gray-500">Promotion Sécurité Numérique</p>
+                    </div>
+                    <!-- Témoignage 3 -->
+                    <div class="luminous-testimonial transform hover:scale-[1.02] shadow-2xl shadow-black/60">
+                        <p class="text-5xl text-primary mb-4 font-serif">“</p>
+                        <p class="text-lg italic mb-4 leading-relaxed font-light text-gray-200">"De zéro en Data à l'implémentation de modèles ML en production. La courbe d'apprentissage est abrupte, mais la récompense est là. Salaire multiplié par deux."</p>
+                        <p class="font-bold text-lg mt-6 text-white">- Marc O. (Ingénieur Data Science)</p>
+                        <p class="text-sm text-gray-500">Promotion Data & IA</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Final -->
+        <section class="py-20 bg-primary/10">
+            <div class="max-w-4xl mx-auto text-center p-8 bg-deep-blue rounded-3xl interactive-card border-2 border-primary/50">
+                <h3 class="text-3xl sm:text-4xl font-extrabold mb-4 text-white">Le Moment de Passer à l'Action, C'est Maintenant.</h3>
+                <p class="text-lg sm:text-xl text-gray-300 mb-8">
+                    Obtenez votre plan de carrière personnalisé gratuitement.
+                </p>
+                <a href="#contact" class="inline-flex justify-center items-center px-10 py-4 border border-transparent text-xl font-extrabold rounded-full shadow-2xl text-deep-blue bg-yellow-400 hover:bg-yellow-500 transition duration-300 transform hover:scale-[1.05] shadow-yellow-400/40">
+                    Je Veux Mon Plan Personnalisé !
+                </a>
+            </div>
+        </section>
+
+        <!-- Section Contact et Formulaire -->
+        <section id="contact" class="py-24 lg:py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl sm:text-5xl font-extrabold text-white mt-2 mb-4">Contactez les Architectes de Votre Futur</h2>
+                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                        Remplissez le formulaire ou appelez-nous pour une consultation sans engagement.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+                    <!-- Formulaire de Contact -->
+                    <div class="p-8 bg-deep-blue rounded-3xl shadow-2xl interactive-card border border-gray-700">
+                        <form action="#" method="POST" class="space-y-6">
+                            <h3 class="text-2xl font-bold text-white border-b border-gray-700 pb-4">Demande de Consultation</h3>
+
+                            <div>
+                                <label for="name" class="block text-sm font-semibold text-gray-300">Nom et Prénom</label>
+                                <div class="mt-2 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                                    <input type="text" name="firstname" id="firstname" autocomplete="given-name" placeholder="Votre prénom" class="flex-1 block w-full rounded-xl bg-gray-700/50 text-white border-gray-700 shadow-sm focus:border-primary focus:ring-primary p-3 border hover:border-primary transition duration-150" required>
+                                    <input type="text" name="lastname" id="lastname" autocomplete="family-name" placeholder="Votre nom" class="flex-1 block w-full rounded-xl bg-gray-700/50 text-white border-gray-700 shadow-sm focus:border-primary focus:ring-primary p-3 border hover:border-primary transition duration-150" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-semibold text-gray-300">E-mail</label>
+                                <div class="mt-2">
+                                    <input id="email" name="email" type="email" autocomplete="email" placeholder="votre.email@exemple.com" class="block w-full rounded-xl bg-gray-700/50 text-white border-gray-700 shadow-sm focus:border-primary focus:ring-primary p-3 border hover:border-primary transition duration-150" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="formation" class="block text-sm font-semibold text-gray-300">Domaine d'intérêt</label>
+                                <div class="mt-2">
+                                    <select id="formation" name="formation" class="block w-full rounded-xl bg-gray-700/50 text-white border-gray-700 shadow-sm focus:border-primary focus:ring-primary p-3 border hover:border-primary transition duration-150">
+                                        <option value="all" class="bg-gray-800">Tous les domaines</option>
+                                        <option value="Développement Logiciel" class="bg-gray-800">Développement Logiciel</option>
+                                        <option value="Sécurité Numérique" class="bg-gray-800">Sécurité Numérique</option>
+                                        <option value="Création & Stratégie" class="bg-gray-800">Création & Stratégie</option>
+                                        <option value="Data & IA" class="bg-gray-800">Data Science & IA</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="message" class="block text-sm font-semibold text-gray-300">Votre Message *</label>
+                                <div class="mt-2">
+                                    <textarea id="message" name="message" rows="4" placeholder="Quel est votre objectif professionnel ?..." class="block w-full rounded-xl bg-gray-700/50 text-white border-gray-700 shadow-sm focus:border-primary focus:ring-primary p-3 border hover:border-primary transition duration-150" required></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-full shadow-xl text-lg font-bold text-white bg-primary hover:bg-primary-dark transition duration-300 transform hover:scale-[1.01] shadow-primary/40">
+                                Envoyer ma demande de contact
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Informations de Contact -->
+                    <div class="space-y-10 p-8 bg-deep-blue rounded-3xl shadow-2xl interactive-card border border-gray-700">
+                        <h3 class="text-2xl font-bold text-white border-b border-gray-700 pb-4">Nos Coordonnées Directes</h3>
+
+                        <div class="space-y-8">
+                            <!-- Localisation -->
+                            <div class="flex items-start">
+                                <span class="text-primary w-8 h-8 mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-white text-lg">Siège Social</p>
+                                    <p class="text-gray-400">17 rue Lingue (Nkombo), Brazzaville, Congo</p>
+                                </div>
+                            </div>
+                            <!-- Téléphone -->
+                            <div class="flex items-start">
+                                <span class="text-primary w-8 h-8 mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.106l-1.519-.462a1.125 1.125 0 01-.832-.806L18 10.5v-.57a1.125 1.125 0 00-1.125-1.125H15V7.5A2.25 2.25 0 0012.75 5.25H11.25a2.25 2.25 0 00-2.25 2.25v2.25H6.75a1.125 1.125 0 00-1.125 1.125V13.5h1.5a1.125 1.125 0 011.125 1.125V15h1.5a1.125 1.125 0 011.125 1.125v.75a1.125 1.125 0 001.125 1.125h3.375a1.125 1.125 0 001.125-1.125v-.75a1.125 1.125 0 011.125-1.125h1.5a1.125 1.125 0 001.125-1.125V10.5" /></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-white text-lg">Appels & WhatsApp</p>
+                                    <p class="text-gray-400">+242 068498792 / +242 068660821</p>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="flex items-start">
+                                <span class="text-primary w-8 h-8 mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-white text-lg">Support E-mail</p>
+                                    <p class="text-gray-400">infotelcomtech@gmail.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Quick Contact Button -->
+    <a href="#contact" class="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-primary text-white shadow-2xl shadow-primary/60 hover:bg-primary-dark transition duration-300 transform hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5m-4.5 3l-1.5 1.5M8.25 21v-1.5M3 16.5h1.5m1.5-1.5h15m-15 0a1.5 1.5 0 00-1.5 1.5v3.75c0 .66.54 1.2 1.2 1.2h3.9c.66 0 1.2-.54 1.2-1.2v-3.75c0-.83.67-1.5 1.5-1.5h3c.83 0 1.5.67 1.5 1.5v3.75c0 .66.54 1.2 1.2 1.2h3.9c.66 0 1.2-.54 1.2-1.2v-3.75a1.5 1.5 0 00-1.5-1.5h-15zM4.5 8.25A1.5 1.5 0 016 6.75h12A1.5 1.5 0 0119.5 8.25v3.75A1.5 1.5 0 0118 13.5H6a1.5 1.5 0 01-1.5-1.5V8.25z" />
+        </svg>
+    </a>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-10 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-10 border-b border-gray-700 pb-12">
+                <!-- Colonne 1: Logo et Mission -->
+                <div class="col-span-2 md:col-span-2 space-y-4">
+                    <a href="#" class="text-3xl font-extrabold text-primary tracking-tight">Infotelcom</a>
+                    <p class="text-gray-400 text-sm max-w-xs">Le hub technologique qui forme les professionnels capables d'innover et de sécuriser l'avenir numérique.</p>
+                </div>
+                <!-- Colonne 2: Navigation -->
+                <div class="space-y-4">
+                    <h4 class="text-xl font-semibold mb-2 text-white">Menu Rapide</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#accueil" class="text-gray-400 hover:text-primary transition duration-150">Accueil</a></li>
+                        <li><a href="#avantages" class="text-gray-400 hover:text-primary transition duration-150">Avantages</a></li>
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-primary transition duration-150">Catalogue Formations</a></li>
+                        <li><a href="#temoignages" class="text-gray-400 hover:text-primary transition duration-150">Témoignages</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-primary transition duration-150">Contact</a></li>
+                    </ul>
+                </div>
+                <!-- Colonne 3: Filières -->
+                <div class="space-y-4">
+                    <h4 class="text-xl font-semibold mb-2 text-white">Domaines Clés</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-primary transition duration-150" data-filter="Développement Logiciel">Dév. Logiciel</a></li>
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-primary transition duration-150" data-filter="Sécurité Numérique">Cybersécurité</a></li>
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-primary transition duration-150" data-filter="Data & IA">Data Science & IA</a></li>
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-primary transition duration-150" data-filter="Création & Stratégie">UX/UI & Stratégie</a></li>
+                    </ul>
+                </div>
+                <!-- Colonne 4: Support -->
+                <div class="space-y-4 col-span-2 md:col-span-1">
+                    <h4 class="text-xl font-semibold mb-2 text-white">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition duration-150">Aide & FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition duration-150">Mentions Légales</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition duration-150">Politique de Confidentialité</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Droits d'auteur -->
+            <div class="mt-8 pt-4 border-t border-gray-800 text-center">
+                <p class="text-gray-600 text-sm">&copy; 2025 Infotelcom - Digital Excellence Hub.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. Données des Formations (avec Catégorie) ---
+            const formations = [
+                {
+                    titre: "Développement Web Full Stack",
+                    description: "Maîtrisez les technologies web modernes : React, Node.js, MongoDB, pour devenir un développeur complet et autonome.",
+                    tags: ["React", "Node.js", "MongoDB", "Architecture Cloud"],
+                    duree: "6 mois",
+                    niveau: "Débutant à Avancé",
+                    categorie: "Développement Logiciel",
+                    statut: "Certifiant Pro",
+                    prix: "2500€",
+                    inscrits: 120
+                },
+                {
+                    titre: "Cybersécurité & Hacking Éthique",
+                    description: "Sécurisez les systèmes et détectez les vulnérabilités. Certification en test d'intrusion et analyse SOC incluse.",
+                    tags: ["Tests d'intrusion", "Linux", "Cryptographie", "Sécurité Réseau"],
+                    duree: "4 mois",
+                    niveau: "Intermédiaire à Avancé",
+                    categorie: "Sécurité Numérique",
+                    statut: "Nouveau Cursus",
+                    prix: "3000€",
+                    inscrits: 80
+                },
+                {
+                    titre: "Marketing Numérique Stratégique",
+                    description: "Créez des stratégies digitales percutantes (SEO/SEA) et maîtrisez l'analyse de performance web.",
+                    tags: ["SEO", "SEA", "Google Ads", "Analyse de Performance"],
+                    duree: "5 mois",
+                    niveau: "Débutant à Intermédiaire",
+                    categorie: "Création & Stratégie",
+                    statut: "Accrédité",
+                    prix: "2200€",
+                    inscrits: 90
+                },
+                {
+                    titre: "Conception UX/UI Avancée",
+                    description: "Axé sur l'ergonomie, la psychologie utilisateur et le prototypage d'interfaces (Figma, Design Systems).",
+                    tags: ["Design System", "Figma", "Prototypage", "Recherche Utilisateur"],
+                    duree: "3 mois",
+                    niveau: "Intermédiaire",
+                    categorie: "Création & Stratégie",
+                    statut: "Spécialisé",
+                    prix: "2800€",
+                    inscrits: 65
+                },
+                {
+                    titre: "Data Science & Machine Learning",
+                    description: "Analyse, modélisation et visualisation de données, Machine Learning avec Python (Pandas, Scikit-learn, TensorFlow).",
+                    tags: ["Python", "Machine Learning", "Analyse Statistique", "Big Data"],
+                    duree: "6 mois",
+                    niveau: "Avancé",
+                    categorie: "Data & IA",
+                    statut: "Certifiant Global",
+                    prix: "3200€",
+                    inscrits: 50
+                },
+                {
+                    titre: "Administration Systèmes Cloud (DevOps)",
+                    description: "Mise en place de l'infrastructure IaaS, CI/CD, conteneurisation (Docker, Kubernetes) et automatisation.",
+                    tags: ["AWS/Azure", "Docker", "Kubernetes", "CI/CD"],
+                    duree: "5 mois",
+                    niveau: "Intermédiaire à Avancé",
+                    categorie: "Développement Logiciel",
+                    statut: "Reconnu",
+                    prix: "2700€",
+                    inscrits: 75
+                }
+            ];
+
+            // --- 2. Logique de Rendu des Cartes ---
+            const listContainer = document.getElementById('formations-list');
+            const primaryColor = '#00A6FF'; // Couleur principale CSS
+
+            function getIconSVG(iconName, color = primaryColor) {
+                // Icons: Time, Level, Status, Price, Enrolled, Contact
+                const svgs = {
+                    duree: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="${color}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                    niveau: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="${color}"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>`,
+                    statut: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="${color}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                    prix: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="${color}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.879c1.03 1.03 2.924 1.03 3.954 0l.879-.879m-4.5-1.5H12m0 0l-1.5 1.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                    inscrits: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="${color}"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 4.749a3.75 3.75 0 00-3.75-.75H12c-2.342 0-4.397 1.05-5.903 2.557M15.75 12a3.75 3.75 0 01-7.5 0M4.501 20.118a1.5 1.5 0 01-.825-.379 1.5 1.5 0 01-.194-.148c-.022-.016-1.077-.732-1.077-3.79s.904-4.832 2.766-4.832c.54 0 1.042.062 1.516.184.475.123.931.298 1.365.512l.142.067a3.036 3.036 0 01.378.199c.041.026.082.052.122.08.384.298.749.638 1.095.992.346.354.678.718.988 1.095.31.377.585.772.825 1.185.24.413.457.85.642 1.306.185.456.327.925.426 1.407.099.482.149.967.149 1.455v.748a1.5 1.5 0 01-1.5 1.5H5.001z" /></svg>`,
+                    contact: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>`
+                };
+                return svgs[iconName] || '';
+            }
+
+            // Fonction pour obtenir la couleur de badge de niveau
+            function getLevelBadgeClass(level) {
+                if (level.includes('Débutant')) return 'badge-debutant';
+                if (level.includes('Intermédiaire')) return 'badge-intermediaire';
+                if (level.includes('Avancé')) return 'badge-avance';
+                return 'bg-gray-500';
+            }
+
+            function renderFormations(filterCategory = 'all') {
+                listContainer.innerHTML = '';
+
+                const filteredFormations = formations.filter(f => {
+                    if (filterCategory === 'all') return true;
+                    return f.categorie === filterCategory;
+                });
+
+                if (filteredFormations.length === 0) {
+                    listContainer.innerHTML = `<p class="text-gray-400 md:col-span-2 text-center p-8 text-xl bg-deep-blue rounded-xl shadow-lg border border-gray-700">Aucune formation n'est listée pour le domaine **${filterCategory}** actuellement. Essayez "Tous les programmes".</p>`;
+                    return;
+                }
+
+                filteredFormations.forEach(f => {
+                    const tagsHTML = f.tags.map(tag =>
+                        `<span class="bg-gray-700/50 text-gray-300 text-xs font-medium px-3 py-1 rounded-full border border-gray-600/50 hover:bg-gray-600 transition">${tag}</span>`
+                    ).join(' ');
+
+                    const levelClass = getLevelBadgeClass(f.niveau);
+                    const priceIcon = f.prix === "Contactez-nous" ? getIconSVG('contact', '#ffffff') : getIconSVG('prix', primaryColor);
+                    const priceTextClass = f.prix === "Contactez-nous" ? 'text-white' : 'text-primary';
+
+
+                    const cardHTML = `
+                        <div class="bg-deep-blue rounded-3xl p-6 interactive-card border-l-4 border-primary/20 hover:border-primary">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="text-2xl font-extrabold text-white">${f.titre}</h3>
+                                <span class="text-xs font-bold text-white px-3 py-1 rounded-full ${levelClass} shadow-md">${f.niveau.split(' ')[0]}</span>
+                            </div>
+
+                            <p class="text-gray-400 mb-5 text-base">${f.description}</p>
+
+                            <div class="flex flex-wrap gap-2 text-sm mb-6 pb-4 border-b border-gray-700">
+                                ${tagsHTML}
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm text-gray-400">
+
+                                <span class="flex items-center font-medium">
+                                    <span class="w-5 h-5 mr-2 text-primary">${getIconSVG('duree')}</span> Durée:
+                                    <span class="text-white ml-1 font-bold">${f.duree}</span>
+                                </span>
+
+                                <span class="flex items-center font-medium">
+                                    <span class="w-5 h-5 mr-2 text-primary">${getIconSVG('statut')}</span> Statut:
+                                    <span class="text-primary ml-1 font-semibold">${f.statut}</span>
+                                </span>
+
+                                <span class="flex items-center font-medium">
+                                    <span class="w-5 h-5 mr-2 text-primary">${getIconSVG('niveau')}</span> Catégorie:
+                                    <span class="text-white ml-1">${f.categorie}</span>
+                                </span>
+
+                                <span class="flex items-center font-medium">
+                                    <span class="w-5 h-5 mr-2 text-primary">${getIconSVG('inscrits')}</span> Inscrits:
+                                    <span class="text-white ml-1 font-bold">${f.inscrits}+</span>
+                                </span>
+                            </div>
+
+                            <div class="mt-8 pt-4 border-t border-gray-700 flex justify-between items-center">
+                                <span class="text-2xl font-extrabold ${priceTextClass} flex items-center">
+                                    <span class="w-6 h-6 mr-1">${priceIcon}</span>
+                                    ${f.prix}
+                                </span>
+                                <a href="#contact" class="text-sm px-6 py-3 bg-primary text-white rounded-full font-bold hover:bg-primary-dark transition duration-300 shadow-xl shadow-primary/30 transform hover:scale-[1.05]">
+                                    Je postule
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.innerHTML += cardHTML;
+                });
+            }
+
+            // --- 3. Logique des Onglets (Tabs) ---
+            const tabContainer = document.getElementById('tab-container');
+
+            function getUniqueCategories() {
+                const categories = formations.map(f => f.categorie);
+                return ['all', ...new Set(categories)];
+            }
+
+            // État pour le filtre actif
+            let activeFilter = 'all';
+
+            function renderTabs() {
+                tabContainer.innerHTML = '';
+                const uniqueCategories = getUniqueCategories();
+
+                // Mappage des noms pour l'affichage
+                const categoryNames = {
+                    'all': 'Tous les Programmes',
+                    'Développement Logiciel': 'Développement Logiciel',
+                    'Sécurité Numérique': 'Sécurité Numérique',
+                    'Création & Stratégie': 'Création & Stratégie',
+                    'Data & IA': 'Data & Intelligence Artificielle',
+                };
+
+                uniqueCategories.forEach(category => {
+                    const count = formations.filter(f => {
+                        if (category === 'all') return true;
+                        return f.categorie === category;
+                    }).length;
+
+                    const isActive = activeFilter === category;
+
+                    const button = document.createElement('button');
+                    button.className = `tab-button text-left ${isActive ? 'active' : ''}`;
+                    button.dataset.filter = category;
+                    button.innerHTML = `<span class="block">${categoryNames[category] || category}</span> <span class="text-xs ${isActive ? 'text-primary' : 'text-gray-500'} font-normal">${count} Cursus</span>`;
+
+                    button.addEventListener('click', () => {
+                        activeFilter = category;
+                        renderTabs(); // Mettre à jour l'état visuel des onglets
+                        renderFormations(category); // Filtrer les formations
+                    });
+
+                    tabContainer.appendChild(button);
+                });
+            }
+
+
+            // --- 4. Logique du Graphique (Chart.js) ---
+            let durationChartInstance = null;
+
+            function renderChart() {
+                if (durationChartInstance) {
+                    durationChartInstance.destroy();
+                }
+
+                const chartCtx = document.getElementById('durationChart').getContext('2d');
+
+                const chartData = formations
+                    .filter(f => f.duree.includes('mois'))
+                    .sort((a, b) => parseInt(a.duree) - parseInt(b.duree));
+
+                const labels = chartData.map(f => `${f.titre.split(' ').slice(0, 2).join(' ')}`);
+                const dataPoints = chartData.map(f => parseInt(f.duree));
+
+                Chart.defaults.color = '#E2E8F0';
+                Chart.defaults.borderColor = '#4A5568';
+
+                const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, primaryColor);
+                gradient.addColorStop(1, 'rgba(0, 166, 255, 0.2)');
+
+
+                durationChartInstance = new Chart(chartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Durée (en mois)',
+                            data: dataPoints,
+                            backgroundColor: gradient,
+                            borderColor: primaryColor,
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            barThickness: 20,
+                            hoverBackgroundColor: '#0077c2'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            y: {
+                                grid: { display: false },
+                                ticks: { font: { size: 12, weight: 'bold' } }
+                            },
+                            x: {
+                                beginAtZero: true,
+                                max: 7,
+                                title: {
+                                    display: true,
+                                    text: 'Durée en Mois',
+                                    font: { weight: 'bold' }
+                                },
+                                grid: {
+                                    color: 'rgba(74, 85, 104, 0.2)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#111A29',
+                                border: '1px solid ' + primaryColor,
+                                padding: 12,
+                                titleFont: { weight: 'bold', size: 14 },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Durée: ${context.raw} mois`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- 5. Initialisation ---
+            renderTabs();
+            renderFormations(activeFilter);
+            renderChart();
+
+            // --- 6. Navigation Fluide (Smooth Scroll) ---
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
