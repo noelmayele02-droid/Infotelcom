@@ -279,13 +279,12 @@ async function afterLogin(user){
   }
 }
 
-// Vérifier si déjà connecté
+// Toujours partir d'une session propre sur cette page :
+// si un admin (ou un autre utilisateur) était connecté avant, on le déconnecte
+// pour éviter qu'une session précédente ne redirige silencieusement vers le mauvais dashboard.
 if(SUPABASE_READY){
   sb.auth.getSession().then(({data:{session}})=>{
-    if(session)afterLogin(session.user);
-  });
-  sb.auth.onAuthStateChange((event,session)=>{
-    if(event==='SIGNED_IN'&&session)afterLogin(session.user);
+    if(session)sb.auth.signOut();
   });
 }else{
   showMsg('ℹ️ Mode démo — Configurez Supabase pour activer la connexion. Voir README-SETUP.md','info');
