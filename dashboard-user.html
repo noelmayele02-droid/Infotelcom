@@ -296,7 +296,7 @@ const SUPABASE_ANON_KEY='sb_publishable_2shrKnCQcJO5a9D1C58AvQ_AklESXuY';
 const W3F_KEY='1574d137-6488-4e03-b780-bb582f50d283';
 
 // Vérifier si Supabase est configuré
-const SUPABASE_READY = SUPABASE_URL !== 'https://ncssencaoacjbpakshrd.supabase.co' && SUPABASE_ANON_KEY !== 'sb_publishable_2shrKnCQcJO5a9D1C58AvQ_AklESXuY';
+const SUPABASE_READY = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
 const sb = SUPABASE_READY ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 let currentUser=null,currentProfile=null,myInsc=[],myMsgs=[],allForms=[];
