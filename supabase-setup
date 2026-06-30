@@ -1,0 +1,278 @@
+-- ═══════════════════════════════════════════════════════════════
+-- INFOTELCOM — Supabase Database Setup COMPLET
+-- Coller dans : Supabase > SQL Editor > New Query > Run
+-- Project : ncssencaoacjbpakshrd
+-- ═══════════════════════════════════════════════════════════════
+
+-- ═══════════════════════════════════════════
+-- 1. TABLE PROFILES (utilisateurs)
+-- ═══════════════════════════════════════════
+create table if not exists public.profiles (
+  id              uuid references auth.users(id) on delete cascade primary key,
+  first_name      text,
+  last_name       text,
+  full_name       text,
+  email           text,
+  phone           text,
+  role            text default 'user' check (role in ('user','admin')),
+  avatar_url      text,
+  created_at      timestamptz default now(),
+  updated_at      timestamptz default now()
+);
+
+-- ═══════════════════════════════════════════
+-- 2. TABLE FORMATIONS
+-- ═══════════════════════════════════════════
+create table if not exists public.formations (
+  id              uuid default gen_random_uuid() primary key,
+  title           text not null,
+  category        text,
+  duration        text,
+  price           numeric default 0,
+  level           text,
+  image_url       text,
+  tags            text[],
+  description     text,
+  status          text default 'published' check (status in ('published','draft')),
+  enrolled_count  integer default 0,
+  created_at      timestamptz default now(),
+  updated_at      timestamptz default now()
+);
+
+-- ═══════════════════════════════════════════
+-- 3. TABLE MESSAGES (contact + messages dashboard)
+-- ═══════════════════════════════════════════
+create table if not exists public.messages (
+  id              uuid default gen_random_uuid() primary key,
+  user_id         uuid references public.profiles(id) on delete set null,
+  from_name       text,
+  from_email      text,
+  phone           text,
+  subject         text,
+  message         text,
+  status          text default 'new' check (status in ('new','read','replied')),
+  reply_content   text,
+  replied_at      timestamptz,
+  created_at      timestamptz default now()
+);
+
+-- ═══════════════════════════════════════════
+-- 4. TABLE INSCRIPTIONS
+-- ═══════════════════════════════════════════
+create table if not exists public.inscriptions (
+  id              uuid default gen_random_uuid() primary key,
+  user_id         uuid references public.profiles(id) on delete cascade,
+  formation_id    uuid references public.formations(id) on delete set null,
+  formation_title text,
+  plan            text default 'Starter',
+  status          text default 'pending' check (status in ('pending','active','completed','cancelled')),
+  message         text,
+  progress        integer default 0,
+  created_at      timestamptz default now()
+);
+
+-- ═══════════════════════════════════════════
+-- 5. TABLE CERTIFICATS ← NOUVEAU
+-- ═══════════════════════════════════════════
+create table if not exists public.certificats (
+  id                  uuid default gen_random_uuid() primary key,
+  numero_certificat   text unique not null,
+  user_id             uuid references public.profiles(id) on delete set null,
+  formation_id        uuid references public.formations(id) on delete set null,
+  nom_titulaire       text not null,
+  formation_titre     text not null,
+  date_obtention      text not null,
+  niveau_certification text default 'Certifié',
+  created_at          timestamptz default now(),
+  created_by          uuid references public.profiles(id) on delete set null
+);
+
+-- Fonction helper pour obtenir l'URL de vérification (au lieu d'une colonne générée)
+create or replace function public.cert_verification_url(numero text)
+returns text as $$
+  select 'https://infotelcom-congo-brazza.netlify.app/?numero=' || numero || '#certification';
+$$ language sql immutable;
+
+-- Index rapide sur le numéro de certificat
+create index if not exists idx_cert_numero on public.certificats(numero_certificat);
+create index if not exists idx_cert_user on public.certificats(user_id);
+
+-- ═══════════════════════════════════════════
+-- 6. TABLE PAIEMENTS
+-- ═══════════════════════════════════════════
+create table if not exists public.paiements (
+  id                  uuid default gen_random_uuid() primary key,
+  inscription_id      uuid references public.inscriptions(id) on delete cascade,
+  user_id             uuid references public.profiles(id) on delete set null,
+  montant             numeric not null,
+  methode_paiement    text default 'mobile_money' check (methode_paiement in ('mobile_money','virement','especes','carte')),
+  statut_paiement     text default 'en_attente' check (statut_paiement in ('en_attente','confirme','refuse','rembourse')),
+  reference           text,
+  notes               text,
+  created_at          timestamptz default now()
+);
+
+-- ═══════════════════════════════════════════
+-- 7. TRIGGER AUTO-PROFIL à l'inscription
+-- ═══════════════════════════════════════════
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, full_name, first_name, last_name, role, phone)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1)),
+    coalesce(new.raw_user_meta_data->>'first_name', ''),
+    coalesce(new.raw_user_meta_data->>'last_name', ''),
+    coalesce(new.raw_user_meta_data->>'role', 'user'),
+    coalesce(new.raw_user_meta_data->>'phone', '')
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- ═══════════════════════════════════════════
+-- 8. TRIGGER auto-export certificats.json
+--    (Vue Supabase pour générer le JSON)
+-- ═══════════════════════════════════════════
+create or replace view public.certificats_json_export as
+select
+  json_agg(
+    json_build_object(
+      'numero', numero_certificat,
+      'nom', nom_titulaire,
+      'formation', formation_titre,
+      'date', date_obtention
+    ) order by created_at desc
+  ) as json_data
+from public.certificats;
+
+-- ═══════════════════════════════════════════
+-- 9. RLS (Row Level Security)
+-- ═══════════════════════════════════════════
+alter table public.profiles       enable row level security;
+alter table public.formations     enable row level security;
+alter table public.messages       enable row level security;
+alter table public.inscriptions   enable row level security;
+alter table public.certificats    enable row level security;
+alter table public.paiements      enable row level security;
+
+-- PROFILES
+drop policy if exists "profiles_select" on public.profiles;
+drop policy if exists "profiles_update" on public.profiles;
+create policy "profiles_select" on public.profiles for select using (true);
+create policy "profiles_update" on public.profiles for update using (auth.uid() = id);
+
+-- FORMATIONS : lecture publique, écriture admins
+drop policy if exists "formations_select" on public.formations;
+drop policy if exists "formations_admin" on public.formations;
+create policy "formations_select" on public.formations for select using (true);
+create policy "formations_admin" on public.formations for all
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+
+-- MESSAGES
+drop policy if exists "messages_select" on public.messages;
+drop policy if exists "messages_insert" on public.messages;
+drop policy if exists "messages_update" on public.messages;
+drop policy if exists "messages_delete" on public.messages;
+create policy "messages_select" on public.messages for select
+  using (auth.uid() = user_id or exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+create policy "messages_insert" on public.messages for insert
+  with check (true);
+create policy "messages_update" on public.messages for update
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+create policy "messages_delete" on public.messages for delete
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+
+-- INSCRIPTIONS
+drop policy if exists "inscriptions_select" on public.inscriptions;
+drop policy if exists "inscriptions_insert" on public.inscriptions;
+drop policy if exists "inscriptions_update" on public.inscriptions;
+create policy "inscriptions_select" on public.inscriptions for select
+  using (auth.uid() = user_id or exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+create policy "inscriptions_insert" on public.inscriptions for insert
+  with check (auth.uid() = user_id);
+create policy "inscriptions_update" on public.inscriptions for update
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+
+-- CERTIFICATS : lecture publique (pour vérification), écriture admins seulement
+drop policy if exists "certificats_select" on public.certificats;
+drop policy if exists "certificats_admin" on public.certificats;
+create policy "certificats_select" on public.certificats for select using (true);
+create policy "certificats_admin" on public.certificats for all
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+
+-- PAIEMENTS : user voit les siens, admin voit tout
+drop policy if exists "paiements_select" on public.paiements;
+drop policy if exists "paiements_admin" on public.paiements;
+create policy "paiements_select" on public.paiements for select
+  using (auth.uid() = user_id or exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+create policy "paiements_admin" on public.paiements for all
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+
+-- ═══════════════════════════════════════════
+-- 10. REALTIME
+-- ═══════════════════════════════════════════
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and tablename='messages') then
+    alter publication supabase_realtime add table public.messages;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and tablename='inscriptions') then
+    alter publication supabase_realtime add table public.inscriptions;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and tablename='profiles') then
+    alter publication supabase_realtime add table public.profiles;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and tablename='certificats') then
+    alter publication supabase_realtime add table public.certificats;
+  end if;
+end $$;
+
+-- ═══════════════════════════════════════════
+-- 11. DONNÉES DE TEST — FORMATIONS
+-- ═══════════════════════════════════════════
+insert into public.formations (title, category, duration, price, level, image_url, tags, description, status) values
+('Développement Web Full Stack','Dev Logiciel','6 mois',150000,'Débutant → Avancé','https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=70','{"React","Node.js","MongoDB","Cloud"}','Maîtrisez le développement web moderne de A à Z.','published'),
+('Cybersécurité & Hacking Éthique','Sécurité','4 mois',180000,'Intermédiaire → Avancé','https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&q=70','{"Pentest","Linux","SOC","Crypto"}','Devenez expert en sécurité informatique et hacking éthique.','published'),
+('Data Science & Machine Learning','Data & IA','6 mois',190000,'Avancé','https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&q=70','{"Python","ML","TensorFlow","Pandas"}','Maîtrisez la data science et l''intelligence artificielle.','published'),
+('UX/UI Design Avancé','Stratégie','3 mois',100000,'Intermédiaire','https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=70','{"Figma","Design System","Prototypage"}','Créez des interfaces utilisateur modernes et efficaces.','published'),
+('Administration Cloud & DevOps','Dev Logiciel','5 mois',160000,'Intermédiaire → Avancé','https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=70','{"AWS","Docker","Kubernetes","CI/CD"}','Maîtrisez le cloud et l''automatisation DevOps.','published'),
+('Marketing Numérique & SEO','Stratégie','5 mois',90000,'Débutant → Intermédiaire','https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=70','{"SEO","Google Ads","Analytics"}','Devenez expert en marketing digital et référencement.','published')
+on conflict do nothing;
+
+-- ═══════════════════════════════════════════
+-- 12. DONNÉES DE TEST — CERTIFICAT EXEMPLE
+-- ═══════════════════════════════════════════
+insert into public.certificats (numero_certificat, nom_titulaire, formation_titre, date_obtention, niveau_certification)
+values ('ITC-2026-0001', 'Exemple Participant', 'Formation de démonstration', '01/01/2026', 'Certifié Pro')
+on conflict (numero_certificat) do nothing;
+
+-- ═══════════════════════════════════════════
+-- 13. FONCTION : Exporter certificats.json depuis Supabase
+--    Usage : select * from export_certificats_json();
+-- ═══════════════════════════════════════════
+create or replace function public.export_certificats_json()
+returns json as $$
+  select json_agg(
+    json_build_object(
+      'numero', numero_certificat,
+      'nom', nom_titulaire,
+      'formation', formation_titre,
+      'date', date_obtention
+    ) order by created_at desc
+  )
+  from public.certificats;
+$$ language sql security definer;
+
+-- ═══════════════════════════════════════════
+-- DONE !
+-- ═══════════════════════════════════════════
+select 'Setup INFOTELCOM v3 terminé avec succès ! Tables: profiles, formations, messages, inscriptions, certificats, paiements' as status;
