@@ -1,0 +1,16 @@
+# Netlify Redirects — INFOTELCOM
+
+# Page d'accueil
+/home        /index.html    301
+/accueil     /index.html    301
+
+# Redirection propre sans .html
+/connexion   /auth.html     301
+/login       /auth.html     301
+/mon-espace  /dashboard-user.html  301
+
+# Pages admin protégées — redirect si pas auth
+/admin       /admin.html    200
+
+# 404 → page d'accueil
+/*           /index.html    404

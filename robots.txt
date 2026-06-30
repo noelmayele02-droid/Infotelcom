@@ -1,0 +1,15 @@
+# INFOTELCOM — robots.txt
+# https://infotelcom-congo-brazza.netlify.app
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /auth.html
+
+# Pages privées — ne pas indexer
+Disallow: /admin.html
+Disallow: /admin-login.html
+Disallow: /dashboard-user.html
+
+# Sitemap
+Sitemap: https://infotelcom-congo-brazza.netlify.app/sitemap.xml
