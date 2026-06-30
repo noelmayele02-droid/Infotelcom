@@ -431,7 +431,7 @@ textarea.inp{resize:vertical;min-height:90px}
 ═══════════════════════════════════ */
 const SUPABASE_URL='https://ncssencaoacjbpakshrd.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_2shrKnCQcJO5a9D1C58AvQ_AklESXuY';
-const SUPABASE_READY = SUPABASE_URL !== 'https://ncssencaoacjbpakshrd.supabase.co' && SUPABASE_ANON_KEY !== 'sb_publishable_2shrKnCQcJO5a9D1C58AvQ_AklESXuY';
+const SUPABASE_READY = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
 const sb = SUPABASE_READY ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const W3F_KEY='1574d137-6488-4e03-b780-bb582f50d283';
 
